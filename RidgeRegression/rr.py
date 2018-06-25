@@ -44,10 +44,10 @@ def regression1(coe, lmd):
     sess = tf.Session()
     init = tf.global_variables_initializer()
     sess.run(init)
-    for i in range(100000):
-        feed = {X:x.T, Y:y.T}
-        sess.run(train_step,feed_dict=feed)
-        print("cost is " + str(sess.run(cost,feed_dict=feed)))
+
+    feed = {X:x.T, Y:y.T}
+    sess.run(train_step,feed_dict=feed)
+    print("cost is " + str(sess.run(cost,feed_dict=feed)))
 
 
     # give prediction

@@ -68,6 +68,11 @@ if __name__ == '__main__':
         cmd = input("Client%d: " % client_id).split(" ")
         # print cmd
 
+        if cmd[0] == 'exit':
+            follower_socket.shutdown(2)
+            follower_socket.close()
+            break
+
         if cmd[0] == "preempt":
             if cmd[1] == None:
                 print("Wrong command! Try again.")

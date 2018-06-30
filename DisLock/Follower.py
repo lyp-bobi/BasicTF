@@ -6,9 +6,8 @@ import json
 
 
 clients = []
-locks = [{"name":'test1',"client":'-1'},{"name":'test2',"client":'-1'}]
+locks = []
 req_msgs = []
-
 
 
 def connect_leader(leader_host, leader_port):
@@ -17,6 +16,8 @@ def connect_leader(leader_host, leader_port):
     leader_socket.sendall(b"NewFollower")
     data = leader_socket.recv(1024).decode().split(":")
 
+    update_all(leader_socket)
+
     if data[0] == "FollowID":
         follwer_id = int(data[1])
 
@@ -24,7 +25,7 @@ def connect_leader(leader_host, leader_port):
 
 
 def update_all(leader_socket):
-    locks= []
+    locks.clear()
     index= 0
     while True:
         tmpstr = "UpdateMap:" + str(index)
@@ -36,11 +37,13 @@ def update_all(leader_socket):
             locks.append({'name': msg[1], 'client': msg[2]})
         else:
             break
+    print("updated all, and the locks are" + str(locks))
 
 # relay leader's msg to client
 def downstream_thread(leader_socket):
     while True:
-        print("locks is "+str(locks))
+
+        # print("locks is "+str(locks))
         data = leader_socket.recv(1024).decode()
         # print "data: ", data
         if not data:
@@ -79,6 +82,7 @@ def downstream_thread(leader_socket):
             req_msgs.pop(0)
 
 
+
 def new_client(conn):
     client_id = follower_id * 10000 + len(clients)
     clients.append({'id': client_id, 'conn': conn})
@@ -107,7 +111,7 @@ def upstream_thread(leader_socket, c):
     client_id = 0
     while True:
         try:
-            print("locks is " + str(locks))
+            #print("locks is " + str(locks))
             data = c.recv(1024).decode()
             if not data:
                 continue
@@ -143,12 +147,13 @@ def upstream_thread(leader_socket, c):
                     c.sendall(b"False")
                 continue
 
-        except socket.error:
+        except Exception:
             print("Socket Error Occured at Client" + str(client_id)+". Releasing it's locks now")
-            c.close()
             tmpstr = "mass_release:"+ str(client_id)
             leader_socket.sendall(tmpstr.encode())
             update_all(leader_socket)
+            c.shutdown(2)
+            c.close()
             return 0
 
 
@@ -173,7 +178,6 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, self_port))
     s.listen(1)
-    update_all(leader_socket)
     while True:
         # accept new connection
         conn, addr = s.accept()

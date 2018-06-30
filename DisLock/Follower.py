@@ -43,12 +43,11 @@ def update_all(leader_socket):
 def downstream_thread(leader_socket):
     while True:
 
-        # print("locks is "+str(locks))
         data = leader_socket.recv(1024).decode()
         # print "data: ", data
         if not data:
             continue
-
+        print("locks is " + str(locks))
         msg = data.split(":")
         # print "msg: ", msg
         if msg[0] == "PreemptLock":
@@ -111,10 +110,10 @@ def upstream_thread(leader_socket, c):
     client_id = 0
     while True:
         try:
-            #print("locks is " + str(locks))
             data = c.recv(1024).decode()
             if not data:
                 continue
+            print("locks is " + str(locks))
             print("Request: " + str(data))
             msg = data.split(":")
 

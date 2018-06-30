@@ -61,14 +61,13 @@ def get_lock_by_index(index):
 def work_thread(c):
     follower_id = -1
     while True:
-        print("list is "+str(locks))
         try:
             data = c.recv(1024)
 
             data = data.decode()
             if not data:
                 continue
-
+            print("locks is " + str(locks))
             print("Request: " + data)
             msg = data.split(":")
 

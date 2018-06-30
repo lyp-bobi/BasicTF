@@ -47,7 +47,6 @@ def downstream_thread(leader_socket):
         # print "data: ", data
         if not data:
             continue
-        print("locks is " + str(locks))
         msg = data.split(":")
         # print "msg: ", msg
         if msg[0] == "PreemptLock":
@@ -79,6 +78,7 @@ def downstream_thread(leader_socket):
             tmpstr = str(data)+":Success"
             c.sendall(tmpstr.encode())
             req_msgs.pop(0)
+        print("locks is " + str(locks))
 
 
 
@@ -113,7 +113,6 @@ def upstream_thread(leader_socket, c):
             data = c.recv(1024).decode()
             if not data:
                 continue
-            print("locks is " + str(locks))
             print("Request: " + str(data))
             msg = data.split(":")
 
@@ -145,6 +144,7 @@ def upstream_thread(leader_socket, c):
                 else:
                     c.sendall(b"False")
                 continue
+            print("locks is " + str(locks))
 
         except Exception:
             print("Socket Error Occured at Client" + str(client_id)+". Releasing it's locks now")
@@ -161,9 +161,9 @@ if __name__ == '__main__':
         print("usage: IP self_port leader_port\n")
         sys.exit(1)
     host = socket.gethostname() # self host
-    print(str(host))
+    # print(str(host))
     myaddr = socket.gethostbyname(host)
-    print("Running follower node at " + str(myaddr))
+    print("Running follower node at " + str(myaddr)+":"+ sys.argv[2])
     host_ = sys.argv[1] # leader host
     self_port = int(sys.argv[2])
     leader_port = int(sys.argv[3])

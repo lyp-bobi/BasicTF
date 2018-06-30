@@ -54,7 +54,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     host = socket.gethostname()  # self host
-    print(str(host))
+    # print(str(host))
     myaddr = socket.gethostbyname(host)
     print("Running client node at " + str(myaddr))
     host_ = sys.argv[1]  # follower's host

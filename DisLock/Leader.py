@@ -1,7 +1,7 @@
 import _thread
 import socket
 import sys
-import time
+import subprocess
 
 
 followers = []
@@ -67,7 +67,6 @@ def work_thread(c):
             data = data.decode()
             if not data:
                 continue
-            print("locks is " + str(locks))
             print("Request: " + data)
             msg = data.split(":")
 
@@ -104,6 +103,7 @@ def work_thread(c):
                 else:
                     c.sendall(b"Failed")
                 continue
+            print("locks is " + str(locks))
         except Exception:
             print("Socket Error Occured at Follower " + str(follower_id))
             c.shutdown(2)
@@ -117,13 +117,15 @@ if __name__ == '__main__':
         sys.exit(1)
 
     host = socket.gethostname()
-    print(str(host))
+    # print(str(host))
     myaddr = socket.gethostbyname(host)
-    print("Running leader node at " + str(myaddr))
+    print("Running leader node at " + str(myaddr)+":"+sys.argv[1])
     port = int(sys.argv[1])
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
     s.listen(8)
+
+    #subprocess.call("python3 Follower.py " +str(myaddr) +" "+str(port+1)+ " " + str(port), shell=True)
 
     while True:
         # accept new connection
